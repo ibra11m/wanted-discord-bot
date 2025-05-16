@@ -7,10 +7,10 @@
   },
   "dependencies": {
     "discord.js": "^14.13.0",
-    "canvas": "^2.11.2",
+    "canvas": "^2.9.3",
     "dotenv": "^16.5.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x"
   }
 }
