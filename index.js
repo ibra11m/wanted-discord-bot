@@ -1,4 +1,18 @@
 require('dotenv').config();
+const express = require('express'); // ← جديد
+const app = express();              // ← جديد
+
+// Route عشان Render يحس أن السيرفر حي
+app.get('/', (req, res) => {
+  res.send('Bot is running');
+});
+
+// يخلي السيرفر يسمع على البورت اللي Render يستخدمه (أو 3000 كافتراضي)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🌐 Web server running on port ${PORT}`);
+});
+
 const { Client, GatewayIntentBits } = require('discord.js');
 const Canvas = require('canvas');
 const fs = require('fs');
