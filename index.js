@@ -112,7 +112,7 @@ async function generateWantedPoster(user) {
 
   const bounty = Math.floor(Math.random() * 7_000_000_001);
   ctx.font = 'bold 100px "Times New Roman"';
-  ctx.fillText(`${bounty.toLocaleString()}`, canvas.width / 2 + 20, 980);
+  ctx.fillText(`${bounty.toLocaleString()}`, canvas.width / 2 + 40, 980);
 
   const fileName = `bounty-${user.id}.png`;
   fs.writeFileSync(fileName, canvas.toBuffer('image/png'));
