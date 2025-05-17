@@ -36,8 +36,8 @@ rest.put(
   ),
   { body: commands }
 )
-  .then(() => console.log('✅ تم تسجيل الأمر /bounty'))
-  .catch(console.error);
+.then(() => console.log('✅ تم تسجيل الأمر /bounty'))
+.catch(console.error);
 
 // بوت جاهز
 client.once('ready', () => {
@@ -48,8 +48,8 @@ client.once('ready', () => {
 client.on('guildMemberAdd', async (member) => {
   try {
     const fileName = await generateWantedPoster(member.user);
-
     const welcomeChannel = await client.channels.fetch(process.env.JOIN_CHANNEL_ID);
+
     if (welcomeChannel) {
       await welcomeChannel.send({
         content: `🪙 عضو جديد انضم للطاقم: **${member.user.username}**!`,
@@ -80,7 +80,11 @@ client.on('interactionCreate', async interaction => {
   } catch (err) {
     console.error('❌ خطأ في توليد بوستر الأمر:', err);
     try {
-      await interaction.followUp({ content: '❌ صار خطأ، حاول لاحقًا.', ephemeral: true });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({ content: '❌ صار خطأ، حاول لاحقًا.', ephemeral: true });
+      } else {
+        await interaction.editReply({ content: '❌ صار خطأ، حاول لاحقًا.' });
+      }
     } catch (e) {
       console.error('❌ خطأ في الرد الاحتياطي:', e);
     }
@@ -112,7 +116,7 @@ async function generateWantedPoster(user) {
 
   const bounty = Math.floor(Math.random() * 7_000_000_001);
   ctx.font = 'bold 100px "Times New Roman"';
-  ctx.fillText(`${bounty.toLocaleString()}`, canvas.width / 2 + 40, 980);
+  ctx.fillText(`${bounty.toLocaleString()}`, (canvas.width / 2) + 40, 980); // ← تحريك الرقم يمين
 
   const fileName = `bounty-${user.id}.png`;
   fs.writeFileSync(fileName, canvas.toBuffer('image/png'));
