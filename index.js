@@ -36,8 +36,8 @@ rest.put(
   ),
   { body: commands }
 )
-.then(() => console.log('✅ تم تسجيل الأمر /bounty'))
-.catch(console.error);
+  .then(() => console.log('✅ تم تسجيل الأمر /bounty'))
+  .catch(console.error);
 
 // بوت جاهز
 client.once('ready', () => {
@@ -67,8 +67,10 @@ client.on('guildMemberAdd', async (member) => {
 client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand() || interaction.commandName !== 'bounty') return;
 
+  let fileName;
+
   try {
-    const fileName = await generateWantedPoster(interaction.user);
+    fileName = await generateWantedPoster(interaction.user);
 
     await interaction.reply({
       content: `🎯 هذه مكافأتك يا **${interaction.user.username}**`,
@@ -80,10 +82,16 @@ client.on('interactionCreate', async interaction => {
     console.error('❌ خطأ في توليد بوستر الأمر:', err);
 
     try {
+      if (fileName && fs.existsSync(fileName)) fs.unlinkSync(fileName);
+
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({
           content: '❌ صار خطأ، حاول لاحقًا.',
           flags: 64
+        });
+      } else if (interaction.deferred) {
+        await interaction.editReply({
+          content: '❌ صار خطأ، حاول لاحقًا.'
         });
       }
     } catch (e) {
@@ -105,7 +113,7 @@ async function generateWantedPoster(user) {
   const background = await Canvas.loadImage(templatePath);
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-  // تعديل حاسم هنا لحل مشكلة النوع
+  // توليد الأفاتار بصيغة png ثابتة
   const avatarURL = user.displayAvatarURL({ extension: 'png', forceStatic: true, size: 512 });
   const avatar = await Canvas.loadImage(avatarURL);
   ctx.drawImage(avatar, 67, 233, 635, 455);
