@@ -65,12 +65,13 @@ client.on('guildMemberAdd', async (member) => {
 
 // أمر /bounty
 client.on('interactionCreate', async interaction => {
-  if (!interaction.isCommand() || interaction.commandName !== 'bounty') return;
+  if (!interaction.isChatInputCommand() || interaction.commandName !== 'bounty') return;
 
   try {
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: false });
 
     const fileName = await generateWantedPoster(interaction.user);
+
     await interaction.editReply({
       content: `🎯 هذه مكافأتك يا **${interaction.user.username}**`,
       files: [fileName],
@@ -79,6 +80,7 @@ client.on('interactionCreate', async interaction => {
     fs.unlinkSync(fileName);
   } catch (err) {
     console.error('❌ خطأ في توليد بوستر الأمر:', err);
+
     try {
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({ content: '❌ صار خطأ، حاول لاحقًا.', ephemeral: true });
@@ -116,7 +118,7 @@ async function generateWantedPoster(user) {
 
   const bounty = Math.floor(Math.random() * 7_000_000_001);
   ctx.font = 'bold 100px "Times New Roman"';
-  ctx.fillText(`${bounty.toLocaleString()}`, (canvas.width / 2) + 40, 980); // ← تحريك الرقم يمين
+  ctx.fillText(`${bounty.toLocaleString()}`, (canvas.width / 2) + 40, 980);
 
   const fileName = `bounty-${user.id}.png`;
   fs.writeFileSync(fileName, canvas.toBuffer('image/png'));
