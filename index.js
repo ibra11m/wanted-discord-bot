@@ -36,8 +36,8 @@ rest.put(
   ),
   { body: commands }
 )
-.then(() => console.log('✅ تم تسجيل الأمر /bounty'))
-.catch(console.error);
+  .then(() => console.log('✅ تم تسجيل الأمر /bounty'))
+  .catch(console.error);
 
 // بوت جاهز
 client.once('ready', () => {
@@ -68,19 +68,26 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand() || interaction.commandName !== 'bounty') return;
 
   try {
+    await interaction.deferReply();
+
     const fileName = await generateWantedPoster(interaction.user);
-    await interaction.reply({
+    await interaction.editReply({
       content: `🎯 هذه مكافأتك يا **${interaction.user.username}**`,
       files: [fileName],
     });
+
     fs.unlinkSync(fileName);
   } catch (err) {
     console.error('❌ خطأ في توليد بوستر الأمر:', err);
-    await interaction.reply({ content: '❌ صار خطأ، حاول لاحقًا.', ephemeral: true });
+    try {
+      await interaction.followUp({ content: '❌ صار خطأ، حاول لاحقًا.', ephemeral: true });
+    } catch (e) {
+      console.error('❌ خطأ في الرد الاحتياطي:', e);
+    }
   }
 });
 
-// الدالة المشتركة لتوليد البوستر
+// توليد البوستر
 async function generateWantedPoster(user) {
   const canvas = Canvas.createCanvas(768, 1086);
   const ctx = canvas.getContext('2d');
@@ -103,7 +110,7 @@ async function generateWantedPoster(user) {
   ctx.textAlign = 'center';
   ctx.fillText(user.username.toUpperCase(), canvas.width / 2, 855);
 
-  const bounty = Math.floor(Math.random() * 7_000_000_001); 
+  const bounty = Math.floor(Math.random() * 7_000_000_001);
   ctx.font = 'bold 100px "Times New Roman"';
   ctx.fillText(`${bounty.toLocaleString()}`, canvas.width / 2, 980);
 
