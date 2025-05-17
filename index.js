@@ -20,6 +20,15 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 });
 
+// حذف الأوامر القديمة (احتياطي)
+const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+rest.put(
+  Routes.applicationGuildCommands(process.env.APPLICATION_ID, process.env.GUILD_ID),
+  { body: [] }
+)
+  .then(() => console.log('🗑️ تم حذف الأوامر القديمة'))
+  .catch(console.error);
+
 // تسجيل أمر /bounty
 const commands = [
   new SlashCommandBuilder()
@@ -28,12 +37,8 @@ const commands = [
     .toJSON()
 ];
 
-const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 rest.put(
-  Routes.applicationGuildCommands(
-    process.env.APPLICATION_ID,
-    process.env.GUILD_ID
-  ),
+  Routes.applicationGuildCommands(process.env.APPLICATION_ID, process.env.GUILD_ID),
   { body: commands }
 )
   .then(() => console.log('✅ تم تسجيل الأمر /bounty'))
@@ -70,9 +75,11 @@ client.on('interactionCreate', async interaction => {
   let fileName;
 
   try {
+    await interaction.deferReply(); // أول شيء نعمله عشان نمنع Unknown interaction
+
     fileName = await generateWantedPoster(interaction.user);
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `🎯 هذه مكافأتك يا **${interaction.user.username}**`,
       files: [fileName]
     });
@@ -84,15 +91,8 @@ client.on('interactionCreate', async interaction => {
     try {
       if (fileName && fs.existsSync(fileName)) fs.unlinkSync(fileName);
 
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ صار خطأ، حاول لاحقًا.',
-          flags: 64
-        });
-      } else if (interaction.deferred) {
-        await interaction.editReply({
-          content: '❌ صار خطأ، حاول لاحقًا.'
-        });
+      if (!interaction.replied) {
+        await interaction.editReply({ content: '❌ صار خطأ، حاول لاحقًا.' });
       }
     } catch (e) {
       console.error('❌ خطأ في الرد الاحتياطي:', e);
@@ -113,7 +113,6 @@ async function generateWantedPoster(user) {
   const background = await Canvas.loadImage(templatePath);
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-  // توليد الأفاتار بصيغة png ثابتة
   const avatarURL = user.displayAvatarURL({ extension: 'png', forceStatic: true, size: 512 });
   const avatar = await Canvas.loadImage(avatarURL);
   ctx.drawImage(avatar, 67, 233, 635, 455);
