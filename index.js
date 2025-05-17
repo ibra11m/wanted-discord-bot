@@ -80,8 +80,11 @@ client.on('interactionCreate', async interaction => {
     console.error('❌ خطأ في توليد بوستر الأمر:', err);
 
     try {
-      if (!interaction.replied) {
-        await interaction.reply({ content: '❌ صار خطأ، حاول لاحقًا.', flags: 64 });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content: '❌ صار خطأ، حاول لاحقًا.',
+          flags: 64 // بديل لـ ephemeral: true
+        });
       }
     } catch (e) {
       console.error('❌ خطأ في الرد الاحتياطي:', e);
@@ -102,9 +105,8 @@ async function generateWantedPoster(user) {
   const background = await Canvas.loadImage(templatePath);
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-  const avatarURL = user.displayAvatarURL({ format: 'png', size: 512 });
+  const avatarURL = user.displayAvatarURL({ format: 'png', forceStatic: true, size: 512 });
   const avatar = await Canvas.loadImage(avatarURL);
-
   ctx.drawImage(avatar, 67, 233, 635, 455);
 
   ctx.font = 'bold 100px "Times New Roman"';
