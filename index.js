@@ -31,12 +31,13 @@ const commands = [
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 rest.put(
   Routes.applicationGuildCommands(
-  process.env.APPLICATION_ID,
-  process.env.GUILD_ID
-)
+    process.env.APPLICATION_ID,
+    process.env.GUILD_ID
+  ),
   { body: commands }
-).then(() => console.log('✅ تم تسجيل الأمر /bounty'))
-  .catch(console.error);
+)
+.then(() => console.log('✅ تم تسجيل الأمر /bounty'))
+.catch(console.error);
 
 // بوت جاهز
 client.once('ready', () => {
