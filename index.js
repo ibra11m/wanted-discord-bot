@@ -99,7 +99,7 @@ async function generateWantedPoster(user) {
   ctx.textAlign = 'center';
   ctx.fillText(user.username.toUpperCase(), canvas.width / 2, 855);
 
-  const bounty = Math.floor(Math.random() * 100_000_000) + 10_000_000;
+  const bounty = Math.floor(Math.random() * 100_000_000_000) + 10_000_000_000;
   ctx.font = 'bold 100px "Times New Roman"';
   ctx.fillText(`${bounty.toLocaleString()}`, canvas.width / 2, 980);
 
