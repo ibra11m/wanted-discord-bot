@@ -68,13 +68,11 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand() || interaction.commandName !== 'bounty') return;
 
   try {
-    await interaction.deferReply({ ephemeral: false });
-
     const fileName = await generateWantedPoster(interaction.user);
 
-    await interaction.editReply({
+    await interaction.reply({
       content: `🎯 هذه مكافأتك يا **${interaction.user.username}**`,
-      files: [fileName],
+      files: [fileName]
     });
 
     fs.unlinkSync(fileName);
@@ -82,10 +80,8 @@ client.on('interactionCreate', async interaction => {
     console.error('❌ خطأ في توليد بوستر الأمر:', err);
 
     try {
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({ content: '❌ صار خطأ، حاول لاحقًا.', ephemeral: true });
-      } else {
-        await interaction.editReply({ content: '❌ صار خطأ، حاول لاحقًا.' });
+      if (!interaction.replied) {
+        await interaction.reply({ content: '❌ صار خطأ، حاول لاحقًا.', flags: 64 });
       }
     } catch (e) {
       console.error('❌ خطأ في الرد الاحتياطي:', e);
