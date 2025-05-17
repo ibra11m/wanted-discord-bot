@@ -30,7 +30,7 @@ const commands = [
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 rest.put(
-  Routes.applicationCommands(process.env.CLIENT_ID),
+  Routes.applicationCommands(process.env.APPLICATION_ID),
   { body: commands }
 ).then(() => console.log('✅ تم تسجيل الأمر /bounty')).catch(console.error);
 
