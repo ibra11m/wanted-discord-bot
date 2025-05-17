@@ -83,7 +83,7 @@ client.on('interactionCreate', async interaction => {
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({
           content: '❌ صار خطأ، حاول لاحقًا.',
-          flags: 64 // بديل لـ ephemeral: true
+          flags: 64
         });
       }
     } catch (e) {
@@ -105,7 +105,8 @@ async function generateWantedPoster(user) {
   const background = await Canvas.loadImage(templatePath);
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-  const avatarURL = user.displayAvatarURL({ format: 'png', forceStatic: true, size: 512 });
+  // تعديل حاسم هنا لحل مشكلة النوع
+  const avatarURL = user.displayAvatarURL({ extension: 'png', forceStatic: true, size: 512 });
   const avatar = await Canvas.loadImage(avatarURL);
   ctx.drawImage(avatar, 67, 233, 635, 455);
 
